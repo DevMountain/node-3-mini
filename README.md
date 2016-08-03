@@ -93,6 +93,7 @@ To use our db in different files we need to do 2 things:
 
 * export the app made by express
 * import it and use it in our other file
+* call our controller
 
 __export our app__
 ```
@@ -122,6 +123,16 @@ module.exports = {
         })
     }
 }
+```
+
+__call our controller__
+
+Comment out call calls to db in your index.js and replace them with a call to the controller and the get planes function.
+
+```
+var controller = require('./controller.js');
+
+controller.getPlanes();
 ```
 
 ## Parameterize our Query
