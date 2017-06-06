@@ -1,1 +1,1 @@
-select * from airplanes --where passengercount > $1
+select * from airplanes

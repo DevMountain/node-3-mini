@@ -12,7 +12,9 @@ Make sure postgres is running on your computer.
 
 ## Install MassiveJS
 
-Run `npm install --save massive`
+Run `npm install --save massive@3.0.0-rc1`
+
+We are installing this specific version of massive because it introduces a lot of breaking changes, and we want to teach you the new API for Massive.
 
 Require massive at the top of your index file.
 
@@ -49,32 +51,40 @@ Use our connection string to get a copy/instance of massive to use.  Then add it
 
 __connection__
 ```
-var massiveInstance = massive.connectSync({connectionString : connectionString})
-
-app.set('db', massiveInstance);
+var app = express();
+massive(connectionString).then(dbInstance => app.set('db', dbInstance))
 ```
 
-Next we can get our db back out of the app
+Express will help you retrieve the dbInstance in each of your routes, like so:
 
-__db__
 ```
-var db = app.get('db');
-```
+app.get('/api/stuff', function(req, res) {
+    var dbInstance = req.app.get('db');
 
+    dbInstance.get_stuff().then(stuff => {
+        res.status(200).json(stuff);
+    })
+})
+```
 
 ## Add a new plane to the database
 
-Now that we have our db we can use it to add a new plane:
+We can add some seed data to our database in the promise callback after massive:
 
 ```
-db.new_plane(function(err, planes){
-    console.log(err, "plane added")
-});
+var app = express()
+massive(connectionString).then(function(dbInstance) {
+    app.set('db', dbInstance);
+
+    dbInstance.new_plane(function(err, planes) {
+        console.log(err, "planes added");
+    })
+})
 ```
 
-This works by looking in the `/db` folder in our app fore a file called `new_plane.sql`
+This works by looking in the `/db` folder in our app for a file called `new_plane.sql`
 
-We've added a plane, comment those 3 lines of code out so we don't add duplicates.
+We've added some planes, so comment out those 3 lines of code so we don't add duplicates.
 
 
 ## Get all planes
@@ -87,66 +97,57 @@ db.get_planes(function(err, planes){
 })
 ```
 
+Remember this has to be done in the callback from the massive connection
+
 ## Queries in different files
 
-To use our db in different files we need to do 2 things:
+We can use our db anywhere req is made available to us. We can use it in a controller like so:
 
-* export the app made by express
-* import it and use it in our other file
-* call our controller
+__index.js__
 
-__export our app__
-```
-//Replace
-var app = express();
-
-//With
-var app = module.exports = express();
-```
-
-This makes it so index.js exports our app.
-
-
-__ import it and use it in another file__
-
-Create a controller.js and put this code inside.
 
 ```
-var app = require('./index');
+var massive = require('massive');
+var controller = require('./controller')
+var connectionString = 'postgres://Brett@localhost/sandbox'
 
-module.exports = {
-    getPlanes: function(){
-        var db = app.get('db');
+var app = express()
+massive(connectionString).then(dbInstance => {
+    app.set('db', dbInstance)
+})
 
-        db.get_planes(function(err, planes){
-            console.log(err, planes);
-        })
-    }
-}
-```
-
-__call our controller__
-
-Comment out call calls to db in your index.js and replace them with a call to the controller and the get planes function.
+app.get('/api/planes', controller.getPlanes);
 
 ```
-var controller = require('./controller.js');
 
-controller.getPlanes();
+__controller.js__
 ```
+exports.getPlanes = function(req, res) {
+  var dbInstance = req.app.get('db')
+
+  dbInstance.get_planes().then(planes => {
+      res.status(200).json(planes)
+  })
+})
+```
+
 
 ## Parameterize our Query
 
-In get_planes.sql uncomment out `where passengercount > $1` by removing the two `--` in front of it.
+In get_planes.sql add `where passengercount > $1`.
 
 The $1 acts as a place holder for the 'first' parameter passed in.
 
 To pass that in change the query in controller.js to take parameters before the function.
 
 ```
-db.get_planes([25], function(err, planes){
-    console.log(err, planes);
-})
+exports.getPlanes = function(req, res) {
+  var dbInstance = req.app.get('db')
+
+  dbInstance.get_planes([25]).then(planes => {
+      res.status(200).json(planes)
+  })
+}
 ```        
 
 We are now getting all planes with a passenger count greater than 25.
