@@ -1,1 +1,3 @@
-select * from airplanes
+select *
+from airplanes
+where passengercount > $1;
