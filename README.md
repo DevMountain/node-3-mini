@@ -289,7 +289,7 @@ In this step, we'll modify the `get_planes` SQL file to use a parameter.
 * Open `get_planes.sql`.
 * At the end of the first line, add `WHERE PassengerCount > $1;`
 * Open `controller.js`.
-* Passing in an array as the first parameter for `dbInstance.get_planes`.
+* Pass in an array as the first parameter for `dbInstance.get_planes`.
   * Use number `25` as the first element of the array.
 
 ### Solution
