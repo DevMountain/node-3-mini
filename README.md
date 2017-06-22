@@ -56,7 +56,7 @@ massive(connectionString).then(dbInstance => app.set('db', dbInstance))
 ```
 
 Express will help you retrieve the dbInstance in each of your routes, like so:
-
+`Note: generic example of the required logic.`
 ```
 app.get('/api/stuff', function(req, res) {
     var dbInstance = req.app.get('db');
@@ -69,14 +69,15 @@ app.get('/api/stuff', function(req, res) {
 
 ## Add a new plane to the database
 
-We can add some seed data to our database in the promise callback after massive:
+We can add some seed data to our database in the promise callback after massive. We can do this
+with the below code:
 
 ```
 var app = express()
 massive(connectionString).then(function(dbInstance) {
     app.set('db', dbInstance);
 
-    dbInstance.new_plane(function(err, planes) {
+    dbInstance.new_plane().then(function(err, planes) {
         console.log(err, "planes added");
     })
 })
@@ -84,7 +85,12 @@ massive(connectionString).then(function(dbInstance) {
 
 This works by looking in the `/db` folder in our app for a file called `new_plane.sql`
 
-We've added some planes, so comment out those 3 lines of code so we don't add duplicates.
+Alright, so we've got our add planes built. Let's turn on `node` through our terminal with
+`node index.js`. Not working? SQL only accepts single insert statements. To correct this, we need to
+open our `new_planes.sql` file and adjust the statement from 5 singular insert statements to 1. If you
+have forgotten how to do this, you simply need to delete the extra INSERT & VALUES statements.
+
+Now that we've added some planes, let's comment out those 3 lines of code so we don't add duplicates.
 
 
 ## Get all planes
@@ -92,12 +98,13 @@ We've added some planes, so comment out those 3 lines of code so we don't add du
 Do the same thing to get all planes using the get_planes file
 
 ```
-db.get_planes(function(err, planes){
+  dbInstance.get_planes().then(function(err, planes) {
     console.log(err, planes)
-})
+    })
+  })
 ```
 
-Remember this has to be done in the callback from the massive connection
+`Remember this has to be done in the callback from the massive connection`
 
 ## Queries in different files
 
