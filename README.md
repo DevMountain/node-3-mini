@@ -8,35 +8,68 @@ In this project, we will go over how to use massive with a node server to connec
 
 * Run `npm install`.
 * Review the `index.js` file to get familiar with it.
+* Make sure postgres is running on your computer.
 
-## Get your database started
+## Step 1
 
-Make sure postgres is running on your computer.
+### Summary
 
-## Install MassiveJS
+In this step, we'll install massive into our project and require it in `index.js`.
 
-Run `npm install --save massive@3.0.0-rc1`
+### Instructions
 
-We are installing this specific version of massive because it introduces a lot of breaking changes, and we want to teach you the new API for Massive.
+* Run `npm install --save massive@3.0.0-rc1`
+* Require `massive` underneath `cors`.
 
-Require massive at the top of your index file.
+### Solution
 
-`var massive = require('massive');`
+<details>
 
-## Setup our table
+<summary> <code> index.js </code> </summary>
 
-Make a new database in postgres called sandbox
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
 
-Add a new table to that database ( [pgAdmin tutorial on how to do both of these](https://www.youtube.com/watch?v=1wvDVBjNDys) ) :
+const app = module.exports = express();
+app.use( bodyParser.json() );
+app.use( cors() );
 
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
-CREATE TABLE airplanes (
-  planeid SERIAL PRIMARY KEY NOT NULL, -- The primary key
-  planetype varchar(40) NOT NULL, -- The IP of the host
-  passengercount integer NOT NULL -- The name of the host
-);
-```
 
+</details> 
+
+## Step 2
+
+### Summary
+
+In this step, we'll create a new database in postgres called `sandbox`. We'll then add a new table to the database called `airplanes`.
+
+### Instructions
+
+* Open a terminal and run `psql`.
+* Create a database named `sandbox`.
+* Connect to the newly created `sanbox` database.
+* Create the following `airplanes` table:
+  * <details>
+    
+    <summary> <code> CREATE TABLE airplanes </code> </summary>
+    
+    ```sql
+    CREATE TABLE airplanes (
+      PlaneID SERIAL PRIMARY KEY NOT NULL,
+      PlaneType varchar(40) NOT NULL,
+      PassengerCount integer NOT NULL
+    );
+    ```
+    
+    </details>
+
+## Solution
 
 ## Connect with Massive to our database
 
