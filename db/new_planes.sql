@@ -1,5 +1,5 @@
-insert into airplanes (planetype, passengercount) values ('747', 200);
-insert into airplanes (planetype, passengercount) values ('717', 10);
-insert into airplanes (planetype, passengercount) values ('727', 20);
-insert into airplanes (planetype, passengercount) values ('737', 30);
-insert into airplanes (planetype, passengercount) values ('757', 500);
+INSERT INTO airplanes ( PlaneType, PassengerCount) VALUES ('747', 200);
+INSERT INTO airplanes ( PlaneType, PassengerCount) VALUES ('717', 10);
+INSERT INTO airplanes ( PlaneType, PassengerCount) VALUES ('727', 20);
+INSERT INTO airplanes ( PlaneType, PassengerCount) VALUES ('737', 30);
+INSERT INTO airplanes ( PlaneType, PassengerCount) VALUES ('757', 500);

@@ -24,4 +24,4 @@ app.use( cors() );
 app.get('/api/planes', controller.getPlanes);
 
 const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
+app.listen('3000', () => { console.log(`Server listening on port ${port}`); } );
