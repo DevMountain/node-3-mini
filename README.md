@@ -71,69 +71,125 @@ In this step, we'll create a new database in postgres called `sandbox`. We'll th
 
 ## Solution
 
-## Connect with Massive to our database
+<b> insert 1.png here </b>
 
-We need to get a copy of massive ot use.  We need : `connectionString > connection > db`
+## Step 3
 
-Add a connection string under your call to require massive.  Change the part that says jeremyrobertson to have your user name.  (If you included password it will look like `username:password@localhost/sandbox`
+### Summary
 
-__connectionString__
-```
-var massive = require('massive');
-var connectionString = "postgres://jeremyrobertson@localhost/sandbox";
-```
+In this step, we'll establish a connection to our database using massive in `index.js`.
 
-Use our connection string to get a copy/instance of massive to use.  Then add it to our app as a variable called db.
+### Instructions
 
-__connection__
-```
-var app = express();
-massive(connectionString).then(dbInstance => app.set('db', dbInstance))
-```
+* Create a variable called `connectionString` that equals `"postgres://username:password@localhost/sandbox"`.
+  * Replace `username` with your username.
+  * Replace `password` with your password.
+* Invoke massive and pass in the connection string. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
 
-Express will help you retrieve the dbInstance in each of your routes, like so:
+### Solution
 
-```
-app.get('/api/stuff', function(req, res) {
-    var dbInstance = req.app.get('db');
+<details>
 
-    dbInstance.get_stuff().then(stuff => {
-        res.status(200).json(stuff);
-    })
-})
-```
+<summary> <code> index.js </code> </summary>
 
-## Add a new plane to the database
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
 
-We can add some seed data to our database in the promise callback after massive:
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => app.set('db', dbInstance) );
 
-```
-var app = express()
-massive(connectionString).then(function(dbInstance) {
-    app.set('db', dbInstance);
+app.use( bodyParser.json() );
+app.use( cors() );
 
-    dbInstance.new_plane(function(err, planes) {
-        console.log(err, "planes added");
-    })
-})
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-This works by looking in the `/db` folder in our app for a file called `new_plane.sql`
+</details>
 
-We've added some planes, so comment out those 3 lines of code so we don't add duplicates.
+## Step 4
 
+### Summary
 
-## Get all planes
+In this step, we will add some seed data to our database using the the files already created in the `db` folder.
 
-Do the same thing to get all planes using the get_planes file
+### Instructions
 
+* Modify the massive `.then` to set `db` on app and also call `dbInstance.new_planes` with the first parameter being a callback function.
+  * The first parameter of the call back function will always be the error.
+* Restart/Run the API so the planes get added to the table.
+* Comment out `dbInstance.new_planes();` so we don't get duplicate planes.
+
+### Solution
+
+<details>
+
+<summary> <code> index.js </code> </summary>
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => {
+  app.set('db', dbInstance);
+
+  // dbInstance.new_planes();
+});
+
+app.use( bodyParser.json() );
+app.use( cors() );
+
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
-db.get_planes(function(err, planes){
-    console.log(err, planes)
-})
+
+</details>
+
+## Step 5
+
+* Underneath the comment of `new_planes`, call `dbInstance.get_planes`.
+* This time we'll provide a callback function to see the results of the query.
+* The callback function should be the first argument and the callback function should have two of its own parameters.
+  * The first parameter should be called `err`.
+  * The second parameter should be called `planes`.
+
+### Solution
+
+<details>
+
+<summary> <code> index.js </code> </summary>
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => {
+  app.set('db', dbInstance);
+
+  // dbInstance.new_planes();
+  dbInstance.get_planes( (err, planes) => { consol.log(err, planes); } );
+});
+
+app.use( bodyParser.json() );
+app.use( cors() );
+
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-Remember this has to be done in the callback from the massive connection
+</details>
 
 ## Queries in different files
 
