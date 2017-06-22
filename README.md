@@ -1,10 +1,13 @@
-# mini-sql-node-massive
+<img src="https://devmounta.in/img/logowhiteblue.png" width="250" align="right">
+
+# Project Summary
+
+In this project, we will go over how to use massive with a node server to connect to a postgres database.
 
 ## Setup
 
-Run `npm install` to install the pre-requisites
-
-Look over the index.js file to get familiar with your starting point.
+* Run `npm install`.
+* Review the `index.js` file to get familiar with it.
 
 ## Get your database started
 
