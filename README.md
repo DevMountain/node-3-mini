@@ -278,26 +278,52 @@ app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 
 </details>
 
+## Step 7
 
-## Parameterize our Query
+### Summary
 
-In get_planes.sql add `where passengercount > $1`.
+In this step, we'll modify the `get_planes` SQL file to use a parameter.
 
-The $1 acts as a place holder for the 'first' parameter passed in.
+### Instructions
 
-To pass that in change the query in controller.js to take parameters before the function.
+* Open `get_planes.sql`.
+* At the end of the first line, add `WHERE PassengerCount > $1;`
+* Open `controller.js`.
+* Passing in an array as the first parameter for `dbInstance.get_planes`.
+  * Use number `25` as the first element of the array.
 
+### Solution
+
+<details>
+
+<summary> <code> get_planes.sql </code> </summary>
+
+```sql
+SELECT * FROM airplanes WHERE PassengerCount > $1;
 ```
-exports.getPlanes = function(req, res) {
-  var dbInstance = req.app.get('db')
 
-  dbInstance.get_planes([25]).then(planes => {
-      res.status(200).json(planes)
-  })
-}
-```        
+</details>
 
-We are now getting all planes with a passenger count greater than 25.
+<details>
+
+<summary> <code> controller.js </code> </summary>
+
+```js
+module.exports = {
+  getPlanes: ( req, res, next ) => {
+    const dbInstance = req.app.get('db');
+
+    dbInstance.get_planes([25])
+      .then(planes => { res.status(200).send(planes); })
+      .catch( err => { 
+        console.log(err);
+        res.status(500).send(err);
+      });
+  }
+};
+```
+
+</details>
 
 ## Contributions
 
