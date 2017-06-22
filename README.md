@@ -214,7 +214,7 @@ In this step, we will use our `dbInstance` in a controller file instead of in `i
 * Get the `dbInstance` by using `req.app.get('db')`.
 * Using the `dbInstace` call `get_planes`.
   * Chain a `.then` with a paramter called `planes`. Then use `res` to send back `planes`.
-  * Chain a `.catch` with a parameter called `err`. Return a `console.log` of `err`.
+  * Chain a `.catch` with a parameter called `err`. Console log the `err` and use `res` to send a status 500.
 * Open `index.js`.
 * Require `controller.js`.
 * Create a `GET` endpoint on `/api/planes/` that calls `controller.getPlanes`.
@@ -230,9 +230,12 @@ module.exports = {
   getPlanes: ( req, res, next ) => {
     const dbInstance = req.app.get('db');
 
-    dbInstance.get_planes().then(planes => {
-      res.status(200).send(planes);
-    });
+    dbInstance.get_planes()
+      .then(planes => { res.status(200).send(planes); })
+      .catch( err => { 
+        console.log(err);
+        res.status(500).send(err);
+      });
   }
 };
 ```
