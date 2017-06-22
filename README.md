@@ -81,6 +81,7 @@ In this step, we'll establish a connection to our database using massive in `ind
 
 ### Instructions
 
+* Open `index.js`.
 * Create a variable called `connectionString` that equals `"postgres://username:password@localhost/sandbox"`.
   * Replace `username` with your username.
   * Replace `password` with your password.
@@ -119,10 +120,12 @@ In this step, we will add some seed data to our database using the the files alr
 
 ### Instructions
 
-* Modify the massive `.then` to set `db` on app and also call `dbInstance.new_planes` with the first parameter being a callback function.
-  * The first parameter of the call back function will always be the error.
+* Open `index.js`.
+* Modify the massive `.then` to set `db` on app and also call `dbInstance.new_planes`.
+  * Chain a `.then` that has a parameter called `planes`. Return a `console.log` of `planes`.
+  * Chain a `.catch` that has a parameter called `err`. Return a `console.log` of `err`.
 * Restart/Run the API so the planes get added to the table.
-* Comment out `dbInstance.new_planes();` so we don't get duplicate planes.
+* Comment out `dbInstance.new_planes` so we don't get duplicate planes.
 
 ### Solution
 
@@ -141,7 +144,9 @@ const app = module.exports = express();
 massive( connectionString ).then( dbInstance => {
   app.set('db', dbInstance);
 
-  // dbInstance.new_planes();
+  // dbInstance.new_planes()
+  //   .then( planes => console.log( planes ) )
+  //   .catch( err => console.log( err ) );
 });
 
 app.use( bodyParser.json() );
@@ -155,11 +160,10 @@ app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 
 ## Step 5
 
+* Open `index.js`.
 * Underneath the comment of `new_planes`, call `dbInstance.get_planes`.
-* This time we'll provide a callback function to see the results of the query.
-* The callback function should be the first argument and the callback function should have two of its own parameters.
-  * The first parameter should be called `err`.
-  * The second parameter should be called `planes`.
+  * Chain a `.then` that has a parameter called `planes`. Return a `console.log` of `planes`.
+  * Chain a `.catch` that has a parameter called `err`. Return a `console.log` of `err`.
 
 ### Solution
 
@@ -178,8 +182,13 @@ const app = module.exports = express();
 massive( connectionString ).then( dbInstance => {
   app.set('db', dbInstance);
 
-  // dbInstance.new_planes();
-  dbInstance.get_planes( (err, planes) => { consol.log(err, planes); } );
+  // dbInstance.new_planes()
+  //   .then( planes => console.log( planes ) )
+  //   .catch( err => console.log( err ) );
+  
+  dbInstance.get_planes()
+    .then( planes => console.log( planes ) )
+    .catch( err => console.log( err ) );
 });
 
 app.use( bodyParser.json() );
@@ -190,38 +199,80 @@ app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
 </details>
+## Step 6
 
-## Queries in different files
+### Summary
 
-We can use our db anywhere req is made available to us. We can use it in a controller like so:
+In this step, we will use our `dbInstance` in a controller file instead of in `index.js`.
 
-__index.js__
+### Instructions
 
+* Open `controller.js`.
+* Use `module.exports` to export an object.
+* Add a `getPlanes` property to the object that equals a function with a `req`, `res`, and `next` parameter.
+* Get the `dbInstance` by using `req.app.get('db')`.
+* Using the `dbInstace` call `get_planes`.
+  * Chain a `.then` with a paramter called `planes`. Then use `res` to send back `planes`.
+  * Chain a `.catch` with a parameter called `err`. Return a `console.log` of `err`.
+* Open `index.js`.
+* Require `controller.js`.
+* Create a `GET` endpoint on `/api/planes/` that calls `controller.getPlanes`.
 
+### Solution
+
+<details>
+
+<summary> <code> controller.js </code> </summary>
+
+```js
+module.exports = {
+  getPlanes: ( req, res, next ) => {
+    const dbInstance = req.app.get('db');
+
+    dbInstance.get_planes().then(planes => {
+      res.status(200).send(planes);
+    });
+  }
+};
 ```
-var massive = require('massive');
-var controller = require('./controller')
-var connectionString = 'postgres://Brett@localhost/sandbox'
 
-var app = express()
-massive(connectionString).then(dbInstance => {
-    app.set('db', dbInstance)
-})
+</details>
+
+<details>
+
+<summary> <code> index.js </code> </summary>
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+const controller = require('./controller');
+
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => {
+  app.set('db', dbInstance);
+
+  // dbInstance.new_planes()
+  //   .then( planes => console.log( planes ) )
+  //   .catch( err => console.log( err ) );
+
+  dbInstance.get_planes()
+    .then( planes => console.log( planes ) )
+    .catch( err => console.log( err ) );
+});
+
+app.use( bodyParser.json() );
+app.use( cors() );
 
 app.get('/api/planes', controller.getPlanes);
 
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-__controller.js__
-```
-exports.getPlanes = function(req, res) {
-  var dbInstance = req.app.get('db')
-
-  dbInstance.get_planes().then(planes => {
-      res.status(200).json(planes)
-  })
-})
-```
+</details>
 
 
 ## Parameterize our Query
