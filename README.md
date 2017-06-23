@@ -71,7 +71,7 @@ In this step, we'll create a new database in postgres called `sandbox`. We'll th
 
 ## Solution
 
-<b> insert 1.png here </b>
+<img src="https://github.com/DevMountain/readme-assets/blob/solution/readme-assets/1.png" />
 
 ## Step 3
 
