@@ -1,158 +1,338 @@
-# mini-sql-node-massive
+<img src="https://devmounta.in/img/logowhiteblue.png" width="250" align="right">
+
+# Project Summary
+
+In this project, we will go over how to use massive with a node server to connect to a postgres database.
 
 ## Setup
 
-Run `npm install` to install the pre-requisites
+* Run `npm install`.
+* Review the `index.js` file to get familiar with it.
+* Make sure postgres is running on your computer.
 
-Look over the index.js file to get familiar with your starting point.
+## Step 1
 
-## Get your database started
+### Summary
 
-Make sure postgres is running on your computer.
+In this step, we'll install massive into our project and require it in `index.js`.
 
-## Install MassiveJS
+### Instructions
 
-Run `npm install --save massive@3.0.0-rc1`
+* Run `npm install --save massive@3.0.0-rc1`
+* Require `massive` underneath `cors`.
 
-We are installing this specific version of massive because it introduces a lot of breaking changes, and we want to teach you the new API for Massive.
+### Solution
 
-Require massive at the top of your index file.
+<details>
 
-`var massive = require('massive');`
+<summary> <code> index.js </code> </summary>
 
-## Setup our table
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
 
-Make a new database in postgres called sandbox
+const app = module.exports = express();
+app.use( bodyParser.json() );
+app.use( cors() );
 
-Add a new table to that database ( [pgAdmin tutorial on how to do both of these](https://www.youtube.com/watch?v=1wvDVBjNDys) ) :
-
-```
-CREATE TABLE airplanes (
-  planeid SERIAL PRIMARY KEY NOT NULL, -- The primary key
-  planetype varchar(40) NOT NULL, -- The IP of the host
-  passengercount integer NOT NULL -- The name of the host
-);
-```
-
-
-## Connect with Massive to our database
-
-We need to get a copy of massive ot use.  We need : `connectionString > connection > db`
-
-Add a connection string under your call to require massive.  Change the part that says jeremyrobertson to have your user name.  (If you included password it will look like `username:password@localhost/sandbox`
-
-__connectionString__
-```
-var massive = require('massive');
-var connectionString = "postgres://jeremyrobertson@localhost/sandbox";
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-Use our connection string to get a copy/instance of massive to use.  Then add it to our app as a variable called db.
+</details> 
 
-__connection__
+## Step 2
+
+### Summary
+
+In this step, we'll create a new database in postgres called `sandbox`. We'll then add a new table to the database called `airplanes`.
+
+### Instructions
+
+* Open a terminal and run `psql`.
+* Create a database named `sandbox`.
+* Connect to the newly created `sanbox` database.
+* Create the following `airplanes` table:
+  * <details>
+    
+    <summary> <code> CREATE TABLE airplanes </code> </summary>
+    
+    ```sql
+    CREATE TABLE airplanes (
+      PlaneID SERIAL PRIMARY KEY NOT NULL,
+      PlaneType varchar(40) NOT NULL,
+      PassengerCount integer NOT NULL
+    );
+    ```
+    
+    </details>
+
+## Solution
+
+<img src="https://github.com/DevMountain/mini-sql-node-massive/blob/solution/readme-assets/1.png" />
+
+## Step 3
+
+### Summary
+
+In this step, we'll establish a connection to our database using massive in `index.js`.
+
+### Instructions
+
+* Open `index.js`.
+* Create a variable called `connectionString` that equals `"postgres://username:password@localhost/sandbox"`.
+  * Replace `username` with your username.
+  * Replace `password` with your password.
+* Invoke massive and pass in the connection string. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
+
+### Solution
+
+<details>
+
+<summary> <code> index.js </code> </summary>
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => app.set('db', dbInstance) );
+
+app.use( bodyParser.json() );
+app.use( cors() );
+
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
-var app = express();
-massive(connectionString).then(dbInstance => app.set('db', dbInstance))
+
+</details>
+
+## Step 4
+
+### Summary
+
+In this step, we will add some seed data to our database using the the files already created in the `db` folder.
+
+### Instructions
+
+* Open `index.js`.
+* Modify the massive `.then` to set `db` on app and also call `dbInstance.new_planes`.
+  * Chain a `.then` that has a parameter called `planes`. Return a `console.log` of `planes`.
+  * Chain a `.catch` that has a parameter called `err`. Return a `console.log` of `err`.
+* Restart/Run the API so the planes get added to the table.
+* Comment out `dbInstance.new_planes` so we don't get duplicate planes.
+
+### Solution
+
+<details>
+
+<summary> <code> index.js </code> </summary>
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => {
+  app.set('db', dbInstance);
+
+  // dbInstance.new_planes()
+  //   .then( planes => console.log( planes ) )
+  //   .catch( err => console.log( err ) );
+});
+
+app.use( bodyParser.json() );
+app.use( cors() );
+
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-Express will help you retrieve the dbInstance in each of your routes, like so:
+</details>
 
+## Step 5
+
+* Open `index.js`.
+* Underneath the comment of `new_planes`, call `dbInstance.get_planes`.
+  * Chain a `.then` that has a parameter called `planes`. Return a `console.log` of `planes`.
+  * Chain a `.catch` that has a parameter called `err`. Return a `console.log` of `err`.
+
+### Solution
+
+<details>
+
+<summary> <code> index.js </code> </summary>
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => {
+  app.set('db', dbInstance);
+
+  // dbInstance.new_planes()
+  //   .then( planes => console.log( planes ) )
+  //   .catch( err => console.log( err ) );
+  
+  dbInstance.get_planes()
+    .then( planes => console.log( planes ) )
+    .catch( err => console.log( err ) );
+});
+
+app.use( bodyParser.json() );
+app.use( cors() );
+
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
-app.get('/api/stuff', function(req, res) {
-    var dbInstance = req.app.get('db');
 
-    dbInstance.get_stuff().then(stuff => {
-        res.status(200).json(stuff);
-    })
-})
+</details>
+
+## Step 6
+
+### Summary
+
+In this step, we will use our `dbInstance` in a controller file instead of in `index.js`.
+
+### Instructions
+
+* Open `controller.js`.
+* Use `module.exports` to export an object.
+* Add a `getPlanes` property to the object that equals a function with a `req`, `res`, and `next` parameter.
+* Get the `dbInstance` by using `req.app.get('db')`.
+* Using the `dbInstace` call `get_planes`.
+  * Chain a `.then` with a paramter called `planes`. Then use `res` to send back `planes`.
+  * Chain a `.catch` with a parameter called `err`. Console log the `err` and use `res` to send a status 500.
+* Open `index.js`.
+* Require `controller.js`.
+* Create a `GET` endpoint on `/api/planes/` that calls `controller.getPlanes`.
+
+### Solution
+
+<details>
+
+<summary> <code> controller.js </code> </summary>
+
+```js
+module.exports = {
+  getPlanes: ( req, res, next ) => {
+    const dbInstance = req.app.get('db');
+
+    dbInstance.get_planes()
+      .then(planes => { res.status(200).send(planes); })
+      .catch( err => { 
+        console.log(err);
+        res.status(500).send(err);
+      });
+  }
+};
 ```
 
-## Add a new plane to the database
+</details>
 
-We can add some seed data to our database in the promise callback after massive:
+<details>
 
-```
-var app = express()
-massive(connectionString).then(function(dbInstance) {
-    app.set('db', dbInstance);
+<summary> <code> index.js </code> </summary>
 
-    dbInstance.new_plane(function(err, planes) {
-        console.log(err, "planes added");
-    })
-})
-```
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const massive = require('massive');
+const connectionString = "postgres://jameslemire@localhost/sandbox";
+const controller = require('./controller');
 
-This works by looking in the `/db` folder in our app for a file called `new_plane.sql`
+const app = module.exports = express();
+massive( connectionString ).then( dbInstance => {
+  app.set('db', dbInstance);
 
-We've added some planes, so comment out those 3 lines of code so we don't add duplicates.
+  // dbInstance.new_planes()
+  //   .then( planes => console.log( planes ) )
+  //   .catch( err => console.log( err ) );
 
+  dbInstance.get_planes()
+    .then( planes => console.log( planes ) )
+    .catch( err => console.log( err ) );
+});
 
-## Get all planes
-
-Do the same thing to get all planes using the get_planes file
-
-```
-db.get_planes(function(err, planes){
-    console.log(err, planes)
-})
-```
-
-Remember this has to be done in the callback from the massive connection
-
-## Queries in different files
-
-We can use our db anywhere req is made available to us. We can use it in a controller like so:
-
-__index.js__
-
-
-```
-var massive = require('massive');
-var controller = require('./controller')
-var connectionString = 'postgres://Brett@localhost/sandbox'
-
-var app = express()
-massive(connectionString).then(dbInstance => {
-    app.set('db', dbInstance)
-})
+app.use( bodyParser.json() );
+app.use( cors() );
 
 app.get('/api/planes', controller.getPlanes);
 
+const port = 3000;
+app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-__controller.js__
+</details>
+
+## Step 7
+
+### Summary
+
+In this step, we'll modify the `get_planes` SQL file to use a parameter.
+
+### Instructions
+
+* Open `get_planes.sql`.
+* At the end of the first line, add `WHERE PassengerCount > $1;`
+* Open `controller.js`.
+* Pass in an array as the first parameter for `dbInstance.get_planes`.
+  * Use number `25` as the first element of the array.
+
+### Solution
+
+<details>
+
+<summary> <code> get_planes.sql </code> </summary>
+
+```sql
+SELECT * FROM airplanes WHERE PassengerCount > $1;
 ```
-exports.getPlanes = function(req, res) {
-  var dbInstance = req.app.get('db')
 
-  dbInstance.get_planes().then(planes => {
-      res.status(200).json(planes)
-  })
-})
+</details>
+
+<details>
+
+<summary> <code> controller.js </code> </summary>
+
+```js
+module.exports = {
+  getPlanes: ( req, res, next ) => {
+    const dbInstance = req.app.get('db');
+
+    dbInstance.get_planes([25])
+      .then(planes => { res.status(200).send(planes); })
+      .catch( err => { 
+        console.log(err);
+        res.status(500).send(err);
+      });
+  }
+};
 ```
 
+</details>
 
-## Parameterize our Query
+## Contributions
 
-In get_planes.sql add `where passengercount > $1`.
-
-The $1 acts as a place holder for the 'first' parameter passed in.
-
-To pass that in change the query in controller.js to take parameters before the function.
-
-```
-exports.getPlanes = function(req, res) {
-  var dbInstance = req.app.get('db')
-
-  dbInstance.get_planes([25]).then(planes => {
-      res.status(200).json(planes)
-  })
-}
-```        
-
-We are now getting all planes with a passenger count greater than 25.
-
+If you see a problem or a typo, please fork, make the necessary changes, and create a pull request so we can review your changes and merge them into the master repo and branch.
 
 ## Copyright
 
-© DevMountain LLC, 2016. Unauthorized use and/or duplication of this material without express and written permission from DevMountain, LLC is strictly prohibited. Excerpts and links may be used, provided that full and clear credit is given to DevMountain with appropriate and specific direction to the original content.
+© DevMountain LLC, 2017. Unauthorized use and/or duplication of this material without express and written permission from DevMountain, LLC is strictly prohibited. Excerpts and links may be used, provided that full and clear credit is given to DevMountain with appropriate and specific direction to the original content.
+
+<p align="center">
+<img src="https://devmounta.in/img/logowhiteblue.png" width="250">
+</p>
