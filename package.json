@@ -21,6 +21,7 @@
     "body-parser": "^1.17.2",
     "cors": "^2.8.3",
     "express": "^4.14.0",
-    "massive": "^3.0.0-rc1"
+    "massive": "~3.2.1",
+    "pg-promise": "~3.4.0"
   }
 }
