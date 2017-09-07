@@ -8,7 +8,6 @@ In this project, we will go over how to use massive with a node server to connec
 
 * Run `npm install`.
 * Review the `index.js` file to get familiar with it.
-* Make sure postgres is running on your computer.
 
 ## Step 1
 
@@ -18,8 +17,9 @@ In this step, we'll install massive into our project and require it in `index.js
 
 ### Instructions
 
-* Run `npm install --save massive@3.0.0-rc1`
+* Run `npm install --save massive dotenv`
 * Require `massive` underneath `cors`.
+* Require and configure dotenv below massive. 
 
 ### Solution
 
@@ -32,13 +32,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const massive = require('massive');
+require('dotenv').config()
 
-const app = module.exports = express();
+const app = express();
 app.use( bodyParser.json() );
 app.use( cors() );
 
-const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
+const port = process.env.PORT || 3000
+app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 ```
 
 </details> 
@@ -47,13 +48,12 @@ app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
 
 ### Summary
 
-In this step, we'll create a new database in postgres called `sandbox`. We'll then add a new table to the database called `airplanes`.
+In this step, we'll connect SQLTabs to our Heroku databse. We'll then add a new table to our Heroku database called `airplanes`.
 
 ### Instructions
 
-* Open a terminal and run `psql`.
-* Create a database named `sandbox`.
-* Connect to the newly created `sanbox` database.
+* Open SQLTabs.
+* Connect to your Heroku database with SQLTabs by using the URI connection string.
 * Create the following `airplanes` table:
   * <details>
     
@@ -69,10 +69,6 @@ In this step, we'll create a new database in postgres called `sandbox`. We'll th
     
     </details>
 
-## Solution
-
-<img src="https://github.com/DevMountain/mini-sql-node-massive/blob/solution/readme-assets/1.png" />
-
 ## Step 3
 
 ### Summary
@@ -82,12 +78,22 @@ In this step, we'll establish a connection to our database using massive in `ind
 ### Instructions
 
 * Open `index.js`.
-* Create a variable called `connectionString` that equals `"postgres://username:password@localhost/sandbox"`.
-  * Replace `username` with your username.
-  * Replace `password` with your password.
-* Invoke massive and pass in the connection string. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
+* Create a file named `.env`
+  * Make sure to add `.env` to your `.gitignore`
+* Open your `.env` and add a variable named `CONNECTION_STRING` that equals the URI connection string from your Heroku database.
+  * Make sure to add `?ssl=true` at end of your connection string.
+  * There should be no quotes around the connection string.
+* Invoke massive and pass in the connection string by accessing the variable `CONNECTION_STRING` from the `.env` file on the process object `process.env.CONNECTION_STRING`. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
 
 ### Solution
+
+<details>
+
+<summary><code> .env </code></summary>
+
+`CONNECTION_STRING=postgres://username:password@host/dbname?ssl=true`
+
+</details>
 
 <details>
 
@@ -98,18 +104,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const massive = require('massive');
-const connectionString = "postgres://jameslemire@localhost/sandbox";
+require('dotenv').config()
 
-const app = module.exports = express();
-massive( connectionString ).then( dbInstance => app.set('db', dbInstance) );
+const app = express();
+massive( process.env.CONNECTION_STRING ).then( dbInstance => app.set('db', dbInstance) );
 
 app.use( bodyParser.json() );
 app.use( cors() );
 
-const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
+const port = process.env.PORT || 3000
+app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 ```
-
 </details>
 
 ## Step 4
@@ -138,10 +143,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const massive = require('massive');
-const connectionString = "postgres://jameslemire@localhost/sandbox";
+require('dotenv').config()
 
-const app = module.exports = express();
-massive( connectionString ).then( dbInstance => {
+const app = express();
+massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   app.set('db', dbInstance);
 
   // dbInstance.new_planes()
@@ -152,8 +157,8 @@ massive( connectionString ).then( dbInstance => {
 app.use( bodyParser.json() );
 app.use( cors() );
 
-const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
+const port = process.env.PORT || 3000
+app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 ```
 
 </details>
@@ -176,10 +181,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const massive = require('massive');
-const connectionString = "postgres://jameslemire@localhost/sandbox";
+require('dotenv').config()
 
-const app = module.exports = express();
-massive( connectionString ).then( dbInstance => {
+const app = express();
+massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   app.set('db', dbInstance);
 
   // dbInstance.new_planes()
@@ -194,8 +199,8 @@ massive( connectionString ).then( dbInstance => {
 app.use( bodyParser.json() );
 app.use( cors() );
 
-const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
+const port = process.env.PORT || 3000
+app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 ```
 
 </details>
@@ -251,11 +256,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const massive = require('massive');
-const connectionString = "postgres://jameslemire@localhost/sandbox";
+require('dotenv').config()
 const controller = require('./controller');
 
-const app = module.exports = express();
-massive( connectionString ).then( dbInstance => {
+const app = express();
+massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   app.set('db', dbInstance);
 
   // dbInstance.new_planes()
@@ -272,8 +277,8 @@ app.use( cors() );
 
 app.get('/api/planes', controller.getPlanes);
 
-const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`) } );
+const port = process.env.PORT || 3000
+app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 ```
 
 </details>
@@ -336,4 +341,3 @@ If you see a problem or a typo, please fork, make the necessary changes, and cre
 <p align="center">
 <img src="https://devmounta.in/img/logowhiteblue.png" width="250">
 </p>
-

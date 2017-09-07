@@ -2,11 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const massive = require('massive');
-const connectionString = "postgres://jameslemire@localhost/sandbox";
+require('dotenv').config()
 const controller = require('./controller');
 
-const app = module.exports = express();
-massive( connectionString ).then( dbInstance => {
+const app = express();
+massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   app.set('db', dbInstance);
 
   // dbInstance.new_planes()
@@ -23,5 +23,5 @@ app.use( cors() );
 
 app.get('/api/planes', controller.getPlanes);
 
-const port = 3000;
-app.listen('3000', () => { console.log(`Server listening on port ${port}`); } );
+const port = process.env.PORT || 3000
+app.listen(port, () => { console.log(`Server listening on port ${port}`); } );
