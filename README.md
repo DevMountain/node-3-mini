@@ -218,11 +218,12 @@ In this step, we will use our `dbInstance` in a controller file instead of in `i
 * Add a `getPlanes` property to the object that equals a function with a `req`, `res`, and `next` parameter.
 * Get the `dbInstance` by using `req.app.get('db')`.
 * Using the `dbInstace` call `get_planes`.
-  * Chain a `.then` with a paramter called `planes`. Then use `res` to send back `planes`.
+  * Chain a `.then` with a paramter called `planes`. Then use `res` to send back `planes` and a status of 200.
   * Chain a `.catch` with a parameter called `err`. Console log the `err` and use `res` to send a status 500.
 * Open `index.js`.
 * Require `controller.js`.
 * Create a `GET` endpoint on `/api/planes/` that calls `controller.getPlanes`.
+* In your index.js file, comment out dbInstance.get_planes as this is now setup in the controller.
 
 ### Solution
 
@@ -267,9 +268,9 @@ massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   //   .then( planes => console.log( planes ) )
   //   .catch( err => console.log( err ) );
 
-  dbInstance.get_planes()
-    .then( planes => console.log( planes ) )
-    .catch( err => console.log( err ) );
+  //dbInstance.get_planes()
+  //  .then( planes => console.log( planes ) )
+  //  .catch( err => console.log( err ) );
 });
 
 app.use( bodyParser.json() );
