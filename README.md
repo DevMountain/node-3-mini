@@ -19,7 +19,7 @@ In this step, we'll install massive into our project and require it in `index.js
 
 * Run `npm install --save massive dotenv`
 * Require `massive` underneath `cors`.
-* Require and configure dotenv below massive. 
+* Require and configure dotenv below massive.
 
 ### Solution
 
@@ -42,7 +42,7 @@ const port = process.env.PORT || 3000
 app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 ```
 
-</details> 
+</details>
 
 ## Step 2
 
@@ -56,17 +56,17 @@ In this step, we'll connect SQLTabs to our Heroku databse. We'll then add a new 
 * Connect to your Heroku database with SQLTabs by using the URI connection string.
 * Create the following `airplanes` table:
   * <details>
-    
+
     <summary> <code> CREATE TABLE airplanes </code> </summary>
-    
+
     ```sql
     CREATE TABLE airplanes (
-      PlaneID SERIAL PRIMARY KEY NOT NULL,
-      PlaneType varchar(40) NOT NULL,
-      PassengerCount integer NOT NULL
+      plane_id SERIAL PRIMARY KEY NOT NULL,
+      plane_type varchar(40) NOT NULL,
+      passenger_count integer NOT NULL
     );
     ```
-    
+
     </details>
 
 ## Step 3
@@ -190,7 +190,7 @@ massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   // dbInstance.new_planes()
   //   .then( planes => console.log( planes ) )
   //   .catch( err => console.log( err ) );
-  
+
   dbInstance.get_planes()
     .then( planes => console.log( planes ) )
     .catch( err => console.log( err ) );
@@ -238,7 +238,7 @@ module.exports = {
 
     dbInstance.get_planes()
       .then(planes => { res.status(200).send(planes); })
-      .catch( err => { 
+      .catch( err => {
         console.log(err);
         res.status(500).send(err);
       });
@@ -293,7 +293,7 @@ In this step, we'll modify the `get_planes` SQL file to use a parameter.
 ### Instructions
 
 * Open `get_planes.sql`.
-* At the end of the first line, add `WHERE PassengerCount > $1;`
+* At the end of the first line, add `WHERE passenger_count > $1;`
 * Open `controller.js`.
 * Pass in an array as the first parameter for `dbInstance.get_planes`.
   * Use number `25` as the first element of the array.
@@ -305,7 +305,7 @@ In this step, we'll modify the `get_planes` SQL file to use a parameter.
 <summary> <code> get_planes.sql </code> </summary>
 
 ```sql
-SELECT * FROM airplanes WHERE PassengerCount > $1;
+SELECT * FROM airplanes WHERE passenger_count > $1;
 ```
 
 </details>
@@ -321,7 +321,7 @@ module.exports = {
 
     dbInstance.get_planes([25])
       .then(planes => { res.status(200).send(planes); })
-      .catch( err => { 
+      .catch( err => {
         console.log(err);
         res.status(500).send(err);
       });
