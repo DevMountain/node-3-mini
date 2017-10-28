@@ -54,6 +54,7 @@ In this step, we'll connect SQLTabs to our Heroku databse. We'll then add a new 
 
 * Open SQLTabs.
 * Connect to your Heroku database with SQLTabs by using the URI connection string.
+    NOTE: The Heroku database needs additional SSL configuration by appending ```?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory``` to the end of the URI connection string.
 * Create the following `airplanes` table:
   * <details>
 
