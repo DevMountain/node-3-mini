@@ -222,7 +222,7 @@ In this step, we will use our `dbInstance` in a controller file instead of in `i
   * Chain a `.catch` with a parameter called `err`. Console log the `err` and use `res` to send a status 500.
 * Open `index.js`.
 * Require `controller.js`.
-* Create a `GET` endpoint on `/api/planes/` that calls `controller.getPlanes`.
+* Create a `GET` endpoint on `/api/planes` that calls `controller.getPlanes`.
 * In your index.js file, comment out dbInstance.get_planes as this is now setup in the controller.
 
 ### Solution
