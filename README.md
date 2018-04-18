@@ -48,7 +48,7 @@ app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 
 ### Summary
 
-In this step, we'll connect SQLTabs to our Heroku databse. We'll then add a new table to our Heroku database called `airplanes`.
+In this step, we'll connect SQLTabs to our Heroku database. We'll then add a new table to our Heroku database called `airplanes`.
 
 ### Instructions
 
