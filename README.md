@@ -17,7 +17,7 @@ In this step, we'll install massive into our project and require it in `index.js
 
 ### Instructions
 
-* Run `npm install --save massive dotenv`
+* Run `npm install massive dotenv`
 * Require `massive` underneath `cors`.
 * Require and configure dotenv below massive.
 
