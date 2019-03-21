@@ -17,7 +17,7 @@ In this step, we'll install massive into our project and require it in `index.js
 
 ### Instructions
 
-* Run `npm install --save massive dotenv`
+* Run `npm install massive dotenv`
 * Require `massive` underneath `cors`.
 * Require and configure dotenv below massive.
 
@@ -28,18 +28,20 @@ In this step, we'll install massive into our project and require it in `index.js
 <summary> <code> index.js </code> </summary>
 
 ```js
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const massive = require('massive');
-require('dotenv').config()
+require("dotenv").config();
+const express = require("express");
+const massive = require("massive");
 
 const app = express();
-app.use( bodyParser.json() );
-app.use( cors() );
 
-const port = process.env.PORT || 3000
-app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
+const { SERVER_PORT } = process.env;
+
+app.use(express.json());
+
+app.listen(SERVER_PORT, () => {
+  console.log(`Server listening on port ${SERVER_PORT}`);
+});
+
 ```
 
 </details>
@@ -77,13 +79,15 @@ In this step, we'll establish a connection to our database using massive in `ind
 
 ### Instructions
 
-* Open `index.js`.
 * Create a file named `.env`
   * Make sure to add `.env` to your `.gitignore`
-* Open your `.env` and add a variable named `CONNECTION_STRING` that equals the URI connection string from your Heroku database.
+* Open your `.env` and add a variable named `SERVER_PORT` and set it to 3000.
+* Add a variable named `CONNECTION_STRING` that equals the URI connection string from your Heroku database.
   * Make sure to add `?ssl=true` at end of your connection string.
   * There should be no quotes around the connection string.
-* Invoke massive and pass in the connection string by accessing the variable `CONNECTION_STRING` from the `.env` file on the process object `process.env.CONNECTION_STRING`. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
+* Open `index.js`.
+* Destructure `CONNECTION_STRING` off of `process.env`.
+* Invoke massive and pass in the connection string by accessing the variable `CONNECTION_STRING`. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
 
 ### Solution
 
@@ -91,7 +95,10 @@ In this step, we'll establish a connection to our database using massive in `ind
 
 <summary><code> .env </code></summary>
 
-`CONNECTION_STRING=postgres://username:password@host/dbname?ssl=true`
+```
+SERVER_PORT=3000
+CONNECTION_STRING=postgres://username:password@host/dbname?ssl=true
+```
 
 </details>
 
@@ -100,20 +107,22 @@ In this step, we'll establish a connection to our database using massive in `ind
 <summary> <code> index.js </code> </summary>
 
 ```js
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const massive = require('massive');
-require('dotenv').config()
+require("dotenv").config();
+const express = require("express");
+const massive = require("massive");
 
 const app = express();
-massive( process.env.CONNECTION_STRING ).then( dbInstance => app.set('db', dbInstance) );
 
-app.use( bodyParser.json() );
-app.use( cors() );
+const { SERVER_PORT, CONNECTION_STRING } = process.env;
 
-const port = process.env.PORT || 3000
-app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
+massive(CONNECTION_STRING).then(dbInstance => app.set("db", dbInstance));
+
+app.use(express.json());
+
+app.listen(SERVER_PORT, () => {
+  console.log(`Server listening on port ${SERVER_PORT}`);
+});
+
 ```
 </details>
 
@@ -139,14 +148,15 @@ In this step, we will add some seed data to our database using the the files alr
 <summary> <code> index.js </code> </summary>
 
 ```js
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const massive = require('massive');
-require('dotenv').config()
+require("dotenv").config();
+const express = require("express");
+const massive = require("massive");
 
 const app = express();
-massive( process.env.CONNECTION_STRING ).then( dbInstance => {
+
+const { SERVER_PORT, CONNECTION_STRING } = process.env;
+
+massive(CONNECTION_STRING).then(dbInstance =>{
   app.set('db', dbInstance);
 
   // dbInstance.new_planes()
@@ -154,11 +164,12 @@ massive( process.env.CONNECTION_STRING ).then( dbInstance => {
   //   .catch( err => console.log( err ) );
 });
 
-app.use( bodyParser.json() );
-app.use( cors() );
+app.use(express.json());
 
-const port = process.env.PORT || 3000
-app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
+app.listen(SERVER_PORT, () => {
+  console.log(`Server listening on port ${SERVER_PORT}`);
+});
+
 ```
 
 </details>
@@ -177,30 +188,32 @@ app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
 <summary> <code> index.js </code> </summary>
 
 ```js
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const massive = require('massive');
-require('dotenv').config()
+require("dotenv").config();
+const express = require("express");
+const massive = require("massive");
 
 const app = express();
-massive( process.env.CONNECTION_STRING ).then( dbInstance => {
-  app.set('db', dbInstance);
+
+const { SERVER_PORT, CONNECTION_STRING } = process.env;
+
+massive(CONNECTION_STRING).then(dbInstance => {
+  app.set("db", dbInstance);
 
   // dbInstance.new_planes()
   //   .then( planes => console.log( planes ) )
   //   .catch( err => console.log( err ) );
 
   dbInstance.get_planes()
-    .then( planes => console.log( planes ) )
-    .catch( err => console.log( err ) );
+    .then(planes => console.log(planes))
+    .catch(err => console.log(err));
 });
 
-app.use( bodyParser.json() );
-app.use( cors() );
+app.use(express.json());
 
-const port = process.env.PORT || 3000
-app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
+app.listen(SERVER_PORT, () => {
+  console.log(`Server listening on port ${SERVER_PORT}`);
+});
+
 ```
 
 </details>
@@ -233,17 +246,20 @@ In this step, we will use our `dbInstance` in a controller file instead of in `i
 
 ```js
 module.exports = {
-  getPlanes: ( req, res, next ) => {
-    const dbInstance = req.app.get('db');
+  getPlanes: (req, res, next) => {
+    const dbInstance = req.app.get("db");
 
     dbInstance.get_planes()
-      .then(planes => { res.status(200).send(planes); })
-      .catch( err => {
+      .then(planes => {
+        res.status(200).send(planes);
+      })
+      .catch(err => {
         console.log(err);
         res.status(500).send(err);
       });
   }
 };
+
 ```
 
 </details>
@@ -253,33 +269,34 @@ module.exports = {
 <summary> <code> index.js </code> </summary>
 
 ```js
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const massive = require('massive');
-require('dotenv').config()
-const controller = require('./controller');
+require("dotenv").config();
+const express = require("express");
+const massive = require("massive");
+const controller = require("./controller");
 
 const app = express();
-massive( process.env.CONNECTION_STRING ).then( dbInstance => {
-  app.set('db', dbInstance);
+
+const { SERVER_PORT, CONNECTION_STRING } = process.env;
+
+massive(CONNECTION_STRING).then(dbInstance => {
+  app.set("db", dbInstance);
 
   // dbInstance.new_planes()
   //   .then( planes => console.log( planes ) )
   //   .catch( err => console.log( err ) );
 
-  //dbInstance.get_planes()
-  //  .then( planes => console.log( planes ) )
-  //  .catch( err => console.log( err ) );
+  // dbInstance.get_planes()
+  //   .then(planes => console.log(planes))
+  //   .catch(err => console.log(err));
 });
 
-app.use( bodyParser.json() );
-app.use( cors() );
+app.use(express.json());
 
-app.get('/api/planes', controller.getPlanes);
+app.get("/api/planes", controller.getPlanes);
 
-const port = process.env.PORT || 3000
-app.listen(port, () => { console.log(`Server listening on port ${port}`) } );
+app.listen(SERVER_PORT, () => {
+  console.log(`Server listening on port ${SERVER_PORT}`);
+});
 ```
 
 </details>
@@ -316,17 +333,20 @@ SELECT * FROM airplanes WHERE passenger_count > $1;
 
 ```js
 module.exports = {
-  getPlanes: ( req, res, next ) => {
-    const dbInstance = req.app.get('db');
+  getPlanes: (req, res, next) => {
+    const dbInstance = req.app.get("db");
 
     dbInstance.get_planes([25])
-      .then(planes => { res.status(200).send(planes); })
-      .catch( err => {
+      .then(planes => {
+        res.status(200).send(planes);
+      })
+      .catch(err => {
         console.log(err);
         res.status(500).send(err);
       });
   }
 };
+
 ```
 
 </details>
