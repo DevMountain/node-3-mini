@@ -18,7 +18,7 @@ In this step, we'll install massive into our project and require it in `index.js
 ### Instructions
 
 * Run `npm install massive dotenv`
-* Require and configure dotenv at the top of the file.
+* Require and configure `dotenv` at the top of the file.
 * Require `massive` underneath `express`.
 
 ### Solution
