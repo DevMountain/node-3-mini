@@ -63,7 +63,7 @@ In this step, we'll connect SQLTabs to our Heroku database. We'll then add a new
 
     ```sql
     CREATE TABLE airplanes (
-      plane_id SERIAL PRIMARY KEY NOT NULL,
+      plane_id SERIAL NOT NULL,
       plane_type varchar(40) NOT NULL,
       passenger_count integer NOT NULL
     );
