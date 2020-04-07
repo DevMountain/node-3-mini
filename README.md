@@ -83,11 +83,10 @@ In this step, we'll establish a connection to our database using massive in `ind
   * Make sure to add `.env` to your `.gitignore`
 * Open your `.env` and add a variable named `SERVER_PORT` and set it to 3000.
 * Add a variable named `CONNECTION_STRING` that equals the URI connection string from your Heroku database.
-  * Make sure to add `?ssl=true` at end of your connection string.
   * There should be no quotes around the connection string.
 * Open `index.js`.
 * Destructure `CONNECTION_STRING` off of `process.env`.
-* Invoke massive and pass in the connection string by accessing the variable `CONNECTION_STRING`. This will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
+* Invoke massive and pass in a configuration object containing our connection string which we can access through the `CONNECTION_STRING` variable.  This configuration object should also contain a nested object called ssl with one property, `rejectUnauthorized` set to false.  By passing in this configuration object, massive will return a promise. Chain a `.then` that has one parameter called `dbInstance` and then returns `app.set('db', dbInstance)`. This will give our express application access to our database.
 
 ### Solution
 
@@ -97,7 +96,7 @@ In this step, we'll establish a connection to our database using massive in `ind
 
 ```
 SERVER_PORT=3000
-CONNECTION_STRING=postgres://username:password@host/dbname?ssl=true
+CONNECTION_STRING=postgres://username:password@host/dbname
 ```
 
 </details>
@@ -115,7 +114,12 @@ const app = express();
 
 const { SERVER_PORT, CONNECTION_STRING } = process.env;
 
-massive(CONNECTION_STRING).then(dbInstance => app.set("db", dbInstance));
+massive({
+  connectionString: CONNECTION_STRING,
+  ssl: {
+    rejectUnauthorized: false
+  }
+}).then(dbInstance => app.set("db", dbInstance));
 
 app.use(express.json());
 
